@@ -9,7 +9,8 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Zocial from "@expo/vector-icons/Zocial";
-
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useNavigation, useRouter } from "expo-router";
 
 type Props = {
   children: ReactNode;
@@ -26,6 +27,15 @@ const ScreendContainerAuth = ({
   isLogin,
   handlebtn,
 }: Props) => {
+
+
+  const navigation = useNavigation()
+  const router = useRouter()
+  const handleGoBack = ()=>{
+    // navigation.goBack()
+    router.back()
+  }
+
   return (
     <ScrollView  style={{
       backgroundColor: "#171744",
@@ -50,7 +60,10 @@ const ScreendContainerAuth = ({
                 {children}
 
                 {/* forger password */}
-                <View style={{ display: "flex", alignItems: "flex-end" }}>
+                <View style={{ display: "flex", flexDirection : "row" , justifyContent: "space-between" }}>
+                  <TouchableOpacity onPress={handleGoBack} >
+                  <Ionicons name="arrow-back-outline" size={24} color="#6d7bba" />
+                  </TouchableOpacity>
                   <TouchableOpacity
                   //  onPress={()=>router.push("/auth/sign-in")}
                   >

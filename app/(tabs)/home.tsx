@@ -1,39 +1,87 @@
-import { View, Text, ScrollView, StyleSheet, Image } from "react-native";
 import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import eventApi from "@/api/modules/event.api";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Fontisto from "@expo/vector-icons/Fontisto";
+import AntDesign from '@expo/vector-icons/AntDesign';
+import { useRouter } from "expo-router";
+import CardEventItem from "@/components/CardEventItem";
+
+type EventData = {
+  background: string;
+  _id: any;
+  display_name: any;
+  start_date: any;
+};
+
+type Events = {
+  cate: string;
+  data: EventData[];
+};
 
 export default function Home() {
-  const [events , setEvents] = useState({})
+  const [events, setEvents] = useState<Events[]>([]);
 
-  useEffect(()=>{
+  const router = useRouter()
 
-    const fetch = async ()=>{
+  useEffect(() => {
+    const fetch = async () => {
       try {
-          const response = await eventApi.getTopEvents()
-          setEvents(response)
+        const res: any = await eventApi.getTopEvents();
+        setEvents(res);
       } catch (error) {
         console.error(error);
       }
-    }
+    };
 
-    fetch()
+    fetch();
+  }, []);
 
-  },[])
+  const handleSeeMore = (cate : string)=>{
+    const queryParams = new URLSearchParams({
+      cate
+  
+    }).toString();
 
-  // console.log('events' , events)
+    router.push(`/search/Search?${queryParams}`)
+  }
+
+  
 
   return (
-    <View >
+    <View style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Image
-            source={require("../../assets/images/logo.png")}
-          />
+          <Image source={require("../../assets/images/logo.png")} />
         </View>
-        <Text style={{ color: "#fff" }}>search</Text>
+        <TouchableOpacity onPress={()=>router.push('/search/Search?cate=all')}>
+          <AntDesign name="search1" size={18} color="#fff" style={styles.searchIcon} />
+        </TouchableOpacity>
       </View>
-      <ScrollView style={{backgroundColor : "#001232" , height: "100%"}}>
+      <ScrollView style={styles.scrollView}>
+        {events.map((e, index) => (
+          <View key={index} style={styles.eventContainer}>
+            {/* header list event */}
+            <View style={styles.eventHeader}>
+              <Text style={styles.eventCategory}>{e.cate}</Text>
+              <TouchableOpacity style={styles.seeMoreButton} onPress={()=>handleSeeMore(e.cate)}>
+                <Text style={styles.seeMoreText}>see more</Text>
+                <MaterialIcons name="navigate-next" size={28} color="#6d7bba" />
+              </TouchableOpacity>
+            </View>
 
+            {/* content list event */}
+            <CardEventItem data={e.data} />
+     
+          </View>
+        ))}
       </ScrollView>
     </View>
   );
@@ -41,14 +89,72 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   container: {
-    // paddingTop: 25,
+    flex: 1,
   },
   header: {
-    padding: 25,
-    paddingTop: 55,
+    padding: 10,
+    // paddingVertical: 10,
+    paddingTop: 35,
     backgroundColor: "#0a1e5e",
-    display: "flex",
-    justifyContent: "space-between",
     flexDirection: "row",
+    justifyContent: "space-between",
   },
+  scrollView: {
+    backgroundColor: "#001232",
+    flex: 1,
+    paddingHorizontal: 10,
+  },
+  eventContainer: {
+    marginVertical: 10,
+  },
+  eventHeader: {
+    paddingTop: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  eventCategory: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  seeMoreButton: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  seeMoreText: {
+    color: "#6d7bba",
+    fontSize: 14,
+  },
+  imagesContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+  imageWrapper: {
+    width: "48%",
+    marginBottom: 18,
+  },
+  image: {
+    // width: 'auto',
+    height: 70,
+    resizeMode: "contain",
+    borderRadius : 6
+  },
+  imageText: {
+    color: "#fff",
+    textAlign: "left",
+    marginTop: 3,
+    fontSize: 14,
+  },
+  textDate: {
+    color: "#b4b4b4",
+  },
+  textContent: {
+    display : "flex", 
+    flexDirection : "column", 
+    gap: 4,
+    paddingTop : 6
+  },
+  searchIcon: {
+    padding : 10,
+  }
 });

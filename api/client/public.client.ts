@@ -1,33 +1,35 @@
 import axios from "axios";
-
+import queryString from 'query-string';
 import { appInfo } from "@/constants/appInfo";
 
-const baseURL = `${appInfo.API_URL}/api`
-const publicClient = axios.create({
-    baseURL ,
-  withCredentials: true
-})
 
-
-publicClient.interceptors.request.use(async (config : any) => {
-  return {
-    ...config,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  };
+const axiosClient = axios.create({
+  baseURL: `${appInfo.API_URL}/api`,
+  paramsSerializer: params => queryString.stringify(params),
 });
 
-publicClient.interceptors.response.use(
-  (response) => {
+axiosClient.interceptors.request.use(async (config: any) => {
+  config.headers = {
+    Authorization: '',
+    Accept: 'application/json',
+    ...config.headers,
+  };
 
-    if (response && response.data) return response.data;
-    return response;
+  config.data;
+  return config;
+});
+
+axiosClient.interceptors.response.use(
+  res => {
+    if (res.data && res.status === 200) {
+      return res.data;
+    }
+    throw new Error('Error');
   },
-  (err) => {
-    console.log(err)
-    return err.response.data;
-  }
+  error => {
+    console.log(`Error api ${JSON.stringify(error)}`);
+    throw new Error(error.response);
+  },
 );
 
-export default publicClient;
+export default axiosClient;
