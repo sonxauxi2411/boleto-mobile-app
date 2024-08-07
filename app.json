@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "ticket",
-    "slug": "ticket",
+    "name": "boleto-mobile-app",
+    "slug": "boleto-mobile-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
