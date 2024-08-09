@@ -7,6 +7,7 @@ type EventData = {
   _id: any;
   display_name: any;
   start_date: any;
+  start_date_time? : any
 };
 
 type Events = {
@@ -22,7 +23,8 @@ export default function CardEventItem(props: Events) {
  
       <View  style={[styles.imagesContainer, { paddingBottom: isSearch ? 240 : 0 }]}>
         {data.map((item: EventData) => {
-          const date = new Date(item.start_date).toLocaleDateString("en-US", {
+  
+          const date = new Date(item.start_date || item.start_date_time ).toLocaleDateString("en-US", {
             month: "short",
             day: "2-digit",
             year: "numeric",

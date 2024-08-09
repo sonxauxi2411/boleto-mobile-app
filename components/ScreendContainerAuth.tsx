@@ -11,13 +11,15 @@ import { LinearGradient } from "expo-linear-gradient";
 import Zocial from "@expo/vector-icons/Zocial";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation, useRouter } from "expo-router";
+import { useDispatch, useSelector } from "react-redux";
+import { authSelector, setIsFormLogin } from "@/redux/reducers/authReducer";
 
 type Props = {
   children: ReactNode;
   title: string;
   subTitle: string;
-  isLogin: boolean;
-  handlebtn: () => void;
+  isLogin?: boolean;
+  handlebtn?: () => void;
 };
 
 const ScreendContainerAuth = ({
@@ -31,9 +33,19 @@ const ScreendContainerAuth = ({
 
   const navigation = useNavigation()
   const router = useRouter()
+  const auth = useSelector(authSelector)
+  const dispatch = useDispatch()
   const handleGoBack = ()=>{
-    // navigation.goBack()
-    router.back()
+    if(!isLogin){
+      dispatch(setIsFormLogin(true))
+    }else {
+      router.push('/home')
+    }
+  }
+
+  const handleNavigateForm = ()=>{
+    dispatch(setIsFormLogin(!auth.isFormLogin))
+
   }
 
   return (
@@ -65,7 +77,7 @@ const ScreendContainerAuth = ({
                   <Ionicons name="arrow-back-outline" size={24} color="#6d7bba" />
                   </TouchableOpacity>
                   <TouchableOpacity
-                  //  onPress={()=>router.push("/auth/sign-in")}
+                  //  onPress={}
                   >
                     <Text
                       style={{
@@ -108,7 +120,7 @@ const ScreendContainerAuth = ({
                       : "Already have an account?"}
                   </Text>
                   <TouchableOpacity
-                  // onPress={()=>router.push("/auth/sign-up")}
+                  onPress={handleNavigateForm}
                   >
                     <Text style={{ color: "#31d7a9", fontSize: 16 }}>
                       {isLogin ? "Sign up now" : "Login"}

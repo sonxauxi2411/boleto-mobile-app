@@ -13,7 +13,7 @@ export default function Profile() {
       <View style={styles.header}>
         <Text style={styles.title}> My Account</Text>
       </View>
-     <View style={{backgroundColor : "#f6f8fa" , height: "100%" , width :"100%", paddingVertical: 20}}>
+     <View style={{backgroundColor : "#fff" , height: "100%" , width :"100%", paddingVertical: 20}}>
      <View style={styles.cardLogin}>
           <Image source={require("../../assets/images/avatar.png")} />
           <View>
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     alignItems : "center",
     marginBottom : 20,
     paddingHorizontal : 10,
-    backgroundColor : "#fff",
+    backgroundColor : "#f6f8fa",
     borderRadius : 10,
   }
 });
