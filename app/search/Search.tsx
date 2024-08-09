@@ -21,6 +21,7 @@ export default function Search() {
   const { cate } = useLocalSearchParams();
   const [results, setResults] = useState<any>([]);
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     //   if(inputRef.current){
@@ -28,15 +29,18 @@ export default function Search() {
     //   }
 
     const fetch = async () => {
+      setLoading(true)
       try {
-        console.log(cate);
         const res = await eventApi.searchEvent({
           cate: cate == "all" ? "" : [cate],
         });
         const { results }: any = res;
         setResults(results);
+        setLoading(false)
       } catch (error) {
         console.error(error);
+      } finally {
+       setLoading(true)
       }
     };
     fetch();
@@ -77,7 +81,7 @@ export default function Search() {
 
         <View >
           <ScrollView  >
-            <CardEventItem data={results} isSearch />
+           {loading ?  <CardEventItem data={results} isSearch /> : <Text style={{color : '#fff'}}>Loading...</Text> }
           
           </ScrollView>
         </View>

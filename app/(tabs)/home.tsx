@@ -28,16 +28,21 @@ type Events = {
 
 export default function Home() {
   const [events, setEvents] = useState<Events[]>([]);
+  const [loading, setLoading] = useState(false)
 
   const router = useRouter()
 
   useEffect(() => {
     const fetch = async () => {
+      setLoading(true)
       try {
         const res: any = await eventApi.getTopEvents();
+        setLoading(false)
         setEvents(res);
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(true)
       }
     };
 
@@ -66,6 +71,7 @@ export default function Home() {
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.scrollView}>
+        {loading ?  <View>
         {events.map((e, index) => (
           <View key={index} style={styles.eventContainer}>
             {/* header list event */}
@@ -82,6 +88,8 @@ export default function Home() {
      
           </View>
         ))}
+        </View> : <Text style={{color : '#fff'}}>Loading...</Text>}
+       
       </ScrollView>
     </View>
   );
