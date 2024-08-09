@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,10 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
+  SafeAreaView ,
+  RefreshControl ,
+  ActivityIndicator,
+  FlatList
 } from "react-native";
 import eventApi from "@/api/modules/event.api";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -28,24 +32,28 @@ type Events = {
 
 export default function Home() {
   const [events, setEvents] = useState<Events[]>([]);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState<boolean>(false)
+
+  const [refreshing, setRefreshing] = useState<boolean>(false);
 
   const router = useRouter()
 
-  useEffect(() => {
-    const fetch = async () => {
-      setLoading(true)
-      try {
-        const res: any = await eventApi.getTopEvents();
-        setLoading(false)
-        setEvents(res);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(true)
-      }
-    };
 
+  const fetch = async () => {
+    setLoading(true)
+    try {
+      const res: any = await eventApi.getTopEvents();
+      setLoading(false)
+      setEvents(res);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(true)
+    }
+  };
+
+
+  useEffect(() => {
     fetch();
   }, []);
 
@@ -57,11 +65,38 @@ export default function Home() {
 
     router.push(`/search/Search?${queryParams}`)
   }
-
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetch().finally(() => setRefreshing(false));
+  }, []);
   
+  const renderItem =({item} : {item : Events})=>{
+
+    return (
+     
+      <View style={styles.eventContainer}>
+         
+         <View style={styles.eventHeader}>
+           <Text style={styles.eventCategory}>{item.cate}</Text>
+           <TouchableOpacity style={styles.seeMoreButton} onPress={()=>handleSeeMore(item.cate)}>
+             <Text style={styles.seeMoreText}>see more</Text>
+             <MaterialIcons name="navigate-next" size={28} color="#6d7bba" />
+           </TouchableOpacity>
+         </View>
+
+ 
+         <CardEventItem data={item.data} />
+  
+       </View>
+      
+
+    )
+  }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={{ flex: 1 }}>
+ 
+       <View style={styles.container}>
       <View style={styles.header}>
         <View>
           <Image source={require("../../assets/images/logo.png")} />
@@ -70,11 +105,26 @@ export default function Home() {
           <AntDesign name="search1" size={18} color="#fff" style={styles.searchIcon} />
         </TouchableOpacity>
       </View>
-      <ScrollView style={styles.scrollView}>
-        {loading ?  <View>
-        {events.map((e, index) => (
+      <View style={styles.scrollView}>
+      {loading ?  
+        
+        <View>
+
+          <FlatList
+            data={events}
+            renderItem={renderItem}
+            keyExtractor={e =>e.cate}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+              /> 
+            }
+          />
+
+        {/* {events.map((e, index) => (
           <View key={index} style={styles.eventContainer}>
-            {/* header list event */}
+         
             <View style={styles.eventHeader}>
               <Text style={styles.eventCategory}>{e.cate}</Text>
               <TouchableOpacity style={styles.seeMoreButton} onPress={()=>handleSeeMore(e.cate)}>
@@ -83,15 +133,22 @@ export default function Home() {
               </TouchableOpacity>
             </View>
 
-            {/* content list event */}
+    
             <CardEventItem data={e.data} />
      
           </View>
-        ))}
+        ))} */}
         </View> : <Text style={{color : '#fff'}}>Loading...</Text>}
+
+      </View>
+        
        
-      </ScrollView>
+
     </View>
+  
+    </SafeAreaView>
+
+    
   );
 }
 
@@ -111,6 +168,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#001232",
     flex: 1,
     paddingHorizontal: 10,
+    
   },
   eventContainer: {
     marginVertical: 10,

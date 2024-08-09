@@ -1,6 +1,8 @@
-import { StyleSheet, Text, View, Image, ScrollView } from "react-native";
+import { StyleSheet, Text, View, Image, ScrollView ,TouchableOpacity } from "react-native";
 import React from "react";
 import Fontisto from "@expo/vector-icons/Fontisto";
+import { useRouter } from "expo-router";
+
 
 type EventData = {
   background: string;
@@ -17,8 +19,10 @@ type Events = {
 
 export default function CardEventItem(props: Events) {
   const { data, isSearch } = props;
-  
-
+  const router = useRouter()
+  const handleNavigation = (id : string)=>{
+    router.push(`/event/Event?id=${id}`)
+  }
   return (
  
       <View  style={[styles.imagesContainer, { paddingBottom: isSearch ? 240 : 0 }]}>
@@ -30,7 +34,7 @@ export default function CardEventItem(props: Events) {
             year: "numeric",
           });
           return (
-            <View key={item._id} style={styles.imageWrapper}>
+            <TouchableOpacity onPress={()=>handleNavigation(item._id)} key={item._id} style={styles.imageWrapper}>
               <Image source={{ uri: item.background }} style={styles.image} />
               <View style={styles.textContent}>
                 <Text
@@ -45,7 +49,7 @@ export default function CardEventItem(props: Events) {
                   <Text style={styles.textDate}>{date}</Text>
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           );
         })}
       </View>
